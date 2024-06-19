@@ -14,5 +14,7 @@ jobs:
   foo-bar:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout
+        uses: actions/checkout@v4.1.7
       - name: foo-bar
-        run: ./ci/foo-bar
+        run: ci/foo-bar
