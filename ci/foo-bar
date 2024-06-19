@@ -4,6 +4,7 @@ set -e -o pipefail
 
 cd $(dirname $0)
 
+echo
 echo downloading kubernetes-sigs/kind executable
 echo
 curl -L https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64 >/tmp/kind
@@ -29,7 +30,11 @@ echo
 /tmp/kind delete cluster || true
 /tmp/kind create cluster --config cluster.yaml
 
-/tmp/kubectl cluster-info --context kind-kind
+echo
+echo configuring deployments
+echo
+/tmp/kubectl kustomize kustomize/overlays/foo | /tmp/kubectl apply -f -
+/tmp/kubectl kustomize kustomize/overlays/bar | /tmp/kubectl apply -f -
 
 echo
 echo removing the test cluster
