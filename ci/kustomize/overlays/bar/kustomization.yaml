@@ -7,9 +7,14 @@ commonLabels:
   app: http-echo-bar
 patches:
   - target:
-      kind: Deployment
       name: .*
     patch: |-
       - op: replace
         path: /metadata/name
+        value: http-echo-bar
+  - target:
+      kind: Service
+    patch: |-
+      - op: replace
+        path: /spec/selector/app
         value: http-echo-bar

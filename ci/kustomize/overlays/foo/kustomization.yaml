@@ -6,10 +6,16 @@ resources:
 commonLabels:
   app: http-echo-foo
 patches:
+patches:
   - target:
-      kind: Deployment
       name: .*
     patch: |-
       - op: replace
         path: /metadata/name
+        value: http-echo-foo
+  - target:
+      kind: Service
+    patch: |-
+      - op: replace
+        path: /spec/selector/app
         value: http-echo-foo
