@@ -17,4 +17,6 @@ jobs:
       - name: foo-bar
         run: ci/foo-bar
       - name: comment
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: gh pr comment --body-file /tmp/test-result
