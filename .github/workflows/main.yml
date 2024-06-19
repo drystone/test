@@ -4,11 +4,9 @@ name: main-push-n-pull
 # yamllint complains about "on" so ...
 # yamllint disable-line
 on:
-  push:
-    branches: ["main"]
   pull_request:
-    branches: ["main"]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   foo-bar:
@@ -18,3 +16,5 @@ jobs:
         uses: actions/checkout@v4.1.7
       - name: foo-bar
         run: ci/foo-bar
+      - name: comment
+        run: gh pr comment --body-file /tmp/test-result
