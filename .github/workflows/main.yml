@@ -11,6 +11,7 @@ on:
 jobs:
   foo-bar:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: checkout
         uses: actions/checkout@v4.1.7
