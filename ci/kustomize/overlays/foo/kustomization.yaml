@@ -6,7 +6,6 @@ resources:
 commonLabels:
   app: http-echo-foo
 patches:
-patches:
   - target:
       name: .*
     patch: |-
@@ -19,3 +18,9 @@ patches:
       - op: replace
         path: /spec/selector/app
         value: http-echo-foo
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/args
+        value: [--text, foo]

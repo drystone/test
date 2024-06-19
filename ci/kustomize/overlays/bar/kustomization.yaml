@@ -18,3 +18,9 @@ patches:
       - op: replace
         path: /spec/selector/app
         value: http-echo-bar
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/args
+        value: [--text, bar]

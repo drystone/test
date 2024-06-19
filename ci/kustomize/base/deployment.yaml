@@ -9,5 +9,6 @@ spec:
       containers:
         - name: http-echo
           image: hashicorp/http-echo
+          args: ["--text", "base"]
           ports:
             - containerPort: 5678
