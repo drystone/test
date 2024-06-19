@@ -1,5 +1,5 @@
 ---
-name: main-push-n-pull
+name: main-pull-request
 
 # yamllint complains about "on" so ...
 # yamllint disable-line
@@ -19,4 +19,5 @@ jobs:
       - name: comment
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh pr comment --body-file /tmp/test-result
+          BRANCH: ${{ github.head_ref }}
+        run: gh pr comment "$BRANCH" --body-file /tmp/test-result
