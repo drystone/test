@@ -34,7 +34,7 @@ until (curl -f foo.localhost && curl -f bar.localhost) >/dev/null 2>&1; do
 done
 
 echo load testing
-docker run --rm --network host -v ${PWD}/k6.js:/k6.js grafana/k6 run -q /k6.js >/tmp/test-result
+docker run -q --rm --network host -v ${PWD}/k6.js:/k6.js grafana/k6 run -q /k6.js >/tmp/test-result
 
 exit
 

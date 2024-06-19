@@ -1,5 +1,5 @@
 ---
-name: main-push-n-pull
+name: main-pull-request
 
 # yamllint complains about "on" so ...
 # yamllint disable-line
@@ -11,10 +11,14 @@ on:
 jobs:
   foo-bar:
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - name: checkout
         uses: actions/checkout@v4.1.7
       - name: foo-bar
         run: ci/foo-bar
       - name: comment
-        run: gh pr comment --body-file /tmp/test-result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.head_ref }}
+        run: gh pr comment "$BRANCH" --body-file /tmp/test-result
