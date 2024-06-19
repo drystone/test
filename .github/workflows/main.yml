@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  create-cluster:
+  foo-bar:
     runs-on: ubuntu-latest
     steps:
-      - name: Kubernetes KinD Cluster
-        uses: container-tools/kind-action@v1
+      - name: foo-bar
+        run: ./ci/foo-bar
