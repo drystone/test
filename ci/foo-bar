@@ -33,8 +33,28 @@ echo
 echo
 echo configuring deployments
 echo
-/tmp/kubectl kustomize kustomize/overlays/foo | /tmp/kubectl apply -f -
-/tmp/kubectl kustomize kustomize/overlays/bar | /tmp/kubectl apply -f -
+/tmp/kubectl kustomize kustomize/overlays/all | /tmp/kubectl apply -f -
+
+echo
+echo installing ingress controller
+echo
+/tmp/kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+/tmp/kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+/tmp/kubectl wait -n ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=5m
+
+echo
+echo configuring ingress
+echo
+/tmp/kubectl apply -f ingress.yaml
+
+echo
+echo waiting for endpoints
+echo
+until (curl -f foo.localhost && curl -f bar.localhost) >/dev/null 2>&1; do
+  sleep 1
+done
+
+exit
 
 echo
 echo removing the test cluster
