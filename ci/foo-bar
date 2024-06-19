@@ -4,64 +4,37 @@ set -e -o pipefail
 
 cd $(dirname $0)
 
-echo
-echo downloading kubernetes-sigs/kind executable
-echo
-curl -L https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64 >/tmp/kind
-echo 1d86e3069ffbe3da9f1a918618aecbc778e00c75f838882d0dfa2d363bc4a68c  /tmp/kind | sha256sum --check || {
-  echo kind checksum mismatch
-  exit 1
-}
+echo downloading executables
+curl -Ls https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64 >/tmp/kind
+echo 1d86e3069ffbe3da9f1a918618aecbc778e00c75f838882d0dfa2d363bc4a68c /tmp/kind | sha256sum --check --quiet
 chmod +x /tmp/kind
-
-echo
-echo downloading kubectl
-echo
-curl -L https://dl.k8s.io/release/v1.30.2/bin/linux/amd64/kubectl >/tmp/kubectl
-echo c6e9c45ce3f82c90663e3c30db3b27c167e8b19d83ed4048b61c1013f6a7c66e  /tmp/kubectl | sha256sum --check || {
-  echo kubectl checksum mismatch
-  exit 1
-}
+curl -Ls https://dl.k8s.io/release/v1.30.2/bin/linux/amd64/kubectl >/tmp/kubectl
+echo c6e9c45ce3f82c90663e3c30db3b27c167e8b19d83ed4048b61c1013f6a7c66e /tmp/kubectl | sha256sum --check --quiet
 chmod +x /tmp/kubectl
 
-echo
-echo starting the test cluster
-echo
-/tmp/kind delete cluster || true
-/tmp/kind create cluster --config cluster.yaml
+echo starting cluster
+/tmp/kind delete cluster >/dev/null 2>&1 || true
+/tmp/kind create cluster --config cluster.yaml >/dev/null 2>&1
 
-echo
 echo configuring deployments
-echo
-/tmp/kubectl kustomize kustomize/overlays/all | /tmp/kubectl apply -f -
+/tmp/kubectl kustomize kustomize/overlays/all | /tmp/kubectl apply -f - >/dev/null 2>&1
 
-echo
 echo installing ingress controller
-echo
-/tmp/kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-/tmp/kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-/tmp/kubectl wait -n ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=5m
+/tmp/kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml >/dev/null 2>&1
+# delete this according to SO 61616203, otherwise we can't immediately create ingress
+/tmp/kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission >/dev/null 2>&1
+/tmp/kubectl wait -n ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=5m >/dev/null 2>&1
 
-echo
 echo configuring ingress
-echo
-/tmp/kubectl apply -f ingress.yaml
+/tmp/kubectl apply -f ingress.yaml >/dev/null 2>&1
 
-echo
 echo waiting for endpoints
-echo
 until (curl -f foo.localhost && curl -f bar.localhost) >/dev/null 2>&1; do
   sleep 1
 done
 
 exit
 
-echo
-echo removing the test cluster
-echo
-/tmp/kind delete cluster
-
-echo
-echo removing executables
-echo
+echo cleaning up
+/tmp/kind delete cluster >/dev/null 2>&1
 rm /tmp/{kind,kubectl}
